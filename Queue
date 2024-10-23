@@ -1,0 +1,647 @@
+/* This program was written to use a Queue data structure to play a game of war*/
+/*This is a multifile java program smashed into one, I will commit where each class starts*/
+/*The GreekHero class was provided to me by my teacher*/
+
+package program4;
+import java.util.*;
+import java.math.*;
+
+public class Program4 {
+	static Scanner kb = new Scanner(System.in);
+	
+public static void main(String[] args) {
+	
+	int userMenuChoice;
+	do {
+		System.out.print("Please make a selection from the following options\n"
+				+"option 1: Test the tools\n"
+				+"option 2: Play a Card Game\n"
+				+"option 3: Quit\n"
+				+"Selection: ");
+			userMenuChoice = kb.nextInt();
+			if (userMenuChoice == 1)
+				{testTheTools();}
+			else if (userMenuChoice == 2)
+				{cardGame ();}
+
+	}while(userMenuChoice != 3);
+	starLine();
+	System.out.println("Goodbye");
+	
+}
+public static void cardGame () {
+	int deckSize = 30;
+	int humanOrCompChoice;
+	GreekHeroArray deck = new GreekHeroArray();
+	Object[] deckShuffled = new Object[deckSize];
+	deckShuffled = deck.getCards();
+	
+	starLine();
+System .out.print("Let's play a game of war!\n\n"
++"Please indicate if you want to play against another player"
++ "\n\tor if you want to play against a computer\n");
+starLine();
+
+	do{
+			System.out.print("Enter 1 for human player\n"
+							+"Enter 2 for computer player: ");
+			humanOrCompChoice = kb.nextInt();
+	}while (humanOrCompChoice != 1 && humanOrCompChoice != 2);
+			
+	Queue Hand1 = new Queue();
+	Queue Hand2 = new Queue();
+	
+	for (int ix = 0; ix<deckSize;ix++)
+	{
+		if((ix % 2) == 0)
+			{Hand1.insert(deckShuffled[ix]);} 
+	
+		else 
+			{Hand2.insert(deckShuffled[ix]);}
+	}
+	if(humanOrCompChoice == 1)
+		{human(Hand1, Hand2);}
+	else if (humanOrCompChoice == 2)
+		{computer(Hand1, Hand2);}
+	}
+
+
+public static void computer(Queue hand1, Queue hand2)
+{
+	int handSizePlayerOne = 15;
+	int handSizePlayerTwo = 15;
+	char attributeChoice = 'a';
+	char quit;
+	int random = 0;
+	int playerValue;
+	int compValue;
+	Object hand1Deleted;
+	Object hand2Deleted;
+	String attributeName;
+	Queue tied = new Queue();
+	boolean playerTurn = true;
+			starLine();
+	do {
+		System.out.print("Enter q to quit the game back to the menu, "
+				+ "enter anyhting else to continue");
+		quit = kb.next().charAt(0);
+		if(quit == 'q')
+			handSizePlayerOne = 0;
+		hand1Deleted = hand1.delete();
+		hand2Deleted = hand2.delete();	
+	System.out.println("Player One hand size: "+handSizePlayerOne+
+						"\nPlayer Two hand size: "+handSizePlayerTwo);
+
+			starLine();
+	if(playerTurn)
+	{	
+	System.out.print("Player One here is your top card: \n");	
+	System.out.print(hand1Deleted+"\n");
+	System.out.print("Please enter which attribute you would like to use: ");
+	attributeChoice = kb.next().charAt(0);
+	}
+	else
+	{
+	System.out.println("Computer's turn to go first\nPRESS ENTER TO CONTINUE");
+		random = (int)(Math.random()*5);
+		attributeChoice = (char)random;
+		kb.nextLine();
+		}
+	playerValue = getAttributeValue (hand1Deleted, attributeChoice);
+	compValue = getAttributeValue (hand2Deleted, attributeChoice);
+	attributeName = getAttributeName(attributeChoice);
+	
+	System.out.print("\nThe leading player plays a card and chooses the "
+			+ "value for "+attributeName + "\nThis makes their "
+			+ "attack power "+playerValue+". The other player's attack power is "
+			+compValue+"\n");
+		
+	if(playerValue > compValue)
+		{System.out.println("PRESS ENTER TO CONTINUE");
+		kb.nextLine();
+		System.out.println("\n*****Player One Wins!*****");
+		hand1.insert(hand1Deleted);
+		hand1.insert(hand2Deleted);
+		handSizePlayerOne = noContest (tied,hand1,handSizePlayerOne);
+		handSizePlayerOne++;
+		handSizePlayerTwo--;
+		playerTurn = true;}
+	
+	else if(compValue > playerValue)
+		{System.out.println("PRESS ENTER TO CONTINUE");
+		kb.nextLine();
+		System.out.println("\n*****Player Two Wins!*****");
+		hand2.insert(hand1Deleted);
+		hand2.insert(hand2Deleted);
+		handSizePlayerTwo = noContest(tied,hand2,handSizePlayerTwo);
+		handSizePlayerTwo ++;
+		handSizePlayerOne--;
+		playerTurn = false;}
+	else 
+		{System.out.println("PRESS ENTER TO CONTINUE");
+		kb.nextLine();
+		System.out.println("\n*****Tie!*****");
+		tied.insert(hand1Deleted);
+		tied.insert(hand2Deleted);
+		handSizePlayerTwo--;
+		handSizePlayerOne--;
+		playerTurn = true;}
+	}while (handSizePlayerTwo != 0 || handSizePlayerOne != 0);
+
+	if (hand1.isEmpty())
+		System.out.println("Game over Player Two Wins!");
+	else
+		System.out.println("Game over Player One Wins!");
+}
+public static int noContest (Queue tieQueue, Queue hand, int handSize)
+{
+Object tieDeleted;
+int count = 0;
+	while (!(tieQueue.isEmpty()))
+	{
+		tieDeleted = tieQueue.delete();
+		hand.insert(tieDeleted);
+		count++;
+	}
+	handSize = handSize+count;
+	return handSize;
+}
+public static int getAttributeValue( Object deck, char playerChoice)
+{
+	int playerValue;
+	
+	if(playerChoice == 'a')
+	{playerValue =  ((GreekHero) deck).getBravery();}
+	else if(playerChoice == 'b')
+	{playerValue = ((GreekHero) deck).getWisdom();}
+	else if(playerChoice == 'c')
+	{playerValue = ((GreekHero) deck).getStrength();}
+	else if(playerChoice == 'd')
+	{playerValue = ((GreekHero) deck).getFerocity();}
+	else 
+	{playerValue = ((GreekHero) deck).getFearFactor();}
+	
+	return playerValue;
+}
+public static String getAttributeName(char playerChoice)
+{
+	String attributeName;
+	if(playerChoice == 'a')
+	{attributeName = "Bravery";}
+	else if(playerChoice == 'b')
+	{attributeName = "Wisdom";}
+	else if(playerChoice == 'c')
+	{attributeName = "Strength";}
+	else if(playerChoice == 'd')
+	{attributeName = "Ferocity";}
+	else 
+	{attributeName = "FearFactor";}
+	return attributeName;
+}
+public static void human(Queue  hand1, Queue  hand2)
+{	
+	int handSizePlayerOne = 15;
+	int handSizePlayerTwo = 15;
+	char attributeChoice = 'a';
+	char quit;
+	int playerOneValue;
+	int playerTwoValue;
+	Object hand1Deleted;
+	Object hand2Deleted;
+	String attributeName;
+	Queue tied = new Queue();
+	boolean playerTurn = true;
+			starLine();
+	do {
+		System.out.print("Enter q to quit the game back to the menu, "
+				+ "enter anyhting else to continue");
+		quit = kb.next().charAt(0);
+		if(quit == 'q')
+			handSizePlayerOne = 0;
+		hand1Deleted = hand1.delete();
+		hand2Deleted = hand2.delete();	
+	System.out.println("Player One hand size: "+handSizePlayerOne+
+						"\nPlayer Two hand size: "+handSizePlayerTwo);
+			starLine();
+			
+	if(playerTurn) {	
+		System.out.print("Player One here is your top card: \n");	
+	System.out.print(hand1Deleted+"\n");
+	System.out.print("Please enter which attribute you would like to use: ");
+	attributeChoice = kb.next().charAt(0);
+	} else {
+		System.out.print("Player Two here is your top card: \n");	
+	System.out.print(hand2Deleted+"\n");
+	System.out.print("Please enter which attribute you would like to use: ");
+	attributeChoice = kb.next().charAt(0);
+	}
+	playerOneValue = getAttributeValue (hand1Deleted, attributeChoice);
+	playerTwoValue = getAttributeValue (hand2Deleted, attributeChoice);
+	attributeName = getAttributeName(attributeChoice);
+	
+	
+	if(playerTurn)
+	{System.out.print("\nThe leading player plays the a card and chooses the "
+			+ "value for "+attributeName + "\nThis makes their attack power "
+			+playerOneValue+". This makes the other player's attack power: "
+			+playerTwoValue+"\n");}
+	else
+	{System.out.print("\nThe leading player plays the a card and chooses the "
+			+ "value for "+attributeName + "\nThis makes their attack power "
+			+playerTwoValue+". This makes the other player's attack power: "
+			+playerOneValue+"\n");}
+
+	
+	if(playerOneValue > playerTwoValue)
+		{System.out.println("PRESS ENTER TO CONTINUE");
+		kb.nextLine();
+		System.out.println("\n*****Player One Wins!*****");
+		hand1.insert(hand1Deleted);
+		hand1.insert(hand2Deleted);
+		handSizePlayerOne = noContest (tied,hand1,handSizePlayerOne);
+		handSizePlayerOne++;
+		handSizePlayerTwo--;
+		playerTurn = true;}
+	
+	else if(playerTwoValue > playerOneValue)
+		{System.out.println("PRESS ENTER TO CONTINUE");
+		kb.nextLine();
+		System.out.println("\n*****Player Two Wins!*****");
+		hand2.insert(hand1Deleted);
+		hand2.insert(hand2Deleted);
+		handSizePlayerTwo = noContest(tied,hand2,handSizePlayerTwo);
+		handSizePlayerTwo ++;
+		handSizePlayerOne--;
+		playerTurn = false;}
+	else 
+		{System.out.println("PRESS ENTER TO CONTINUE");
+		kb.nextLine();
+		System.out.println("\n*****Tie!*****");
+		tied.insert(hand1Deleted);
+		tied.insert(hand2Deleted);
+		handSizePlayerTwo--;
+		handSizePlayerOne--;
+		playerTurn = true;
+			}
+		
+	}while (handSizePlayerTwo != 0 || handSizePlayerOne != 0);
+
+	if (hand1.isEmpty())
+		System.out.println("Game over Player Two Wins!");
+	else
+		System.out.println("Game over Player One Wins!");
+}
+public static void testTheTools ()
+{
+	queueTest();
+}
+public static void queueTest ()	
+{
+	Queue q1 = new Queue();
+	Queue q2 = new Queue();
+	int input;
+do {
+	System.out.println("Please choose which queue you would like to work with\n"
+			+" \tor quit the program");
+	starLine();
+	System.out.print("Enter 1 for queue#1 or 2 for queue#2\n");
+	System.out.print("Or enter 3 to quit: ");
+	
+	input = kb.nextInt();
+		if (input == 1)
+			{queueMenu(q1);}
+		else if(input == 2)
+			{queueMenu (q2);}
+	
+	}while (input != 3);
+starLine();
+System.out.print("Goodbye\n");
+starLine();
+}
+
+public static void queueMenu (Queue queue)
+{	int input;
+
+	do {
+		starLine();
+	System.out.println("Available options:");
+	System.out.print("\nOption 1: delete an object from the queue\n"
+			+"Option 2: Insert object at the back of the queue\n"
+			+"Option 3: Test to see if queue is empty\n"
+			+"Option 4: Summerize contents of the queue (no empty spaces)\n"
+			+"Option 5: Summerize contents of the entire queue storage"
+			+ "(includes empty spaces)\n"
+			+"Option 6: Exit to previous menu\n"
+			+"Please enter the number: ");
+		input = kb.nextInt();
+
+	if (input == 1)
+		{option1(queue);}
+	else if(input == 2)
+		{option2(queue);}
+	else if(input == 3)
+		{option3(queue);}
+	else if(input == 4)
+		{option4(queue);}
+	else if(input == 5)
+		{option5(queue);}
+	else if (input == 6)
+		{continue;}
+	else 
+		{System.out.println("Invalid input. Try again");
+		input = kb.nextInt();}
+	}while(input != 6);
+	}
+public static void option1 (Queue queue)
+{
+starLine();
+	if(queue.isEmpty())
+		{System.out.print("Queue is empty. Nothing deleted\n");}
+
+		else
+		{
+			Object deleted = queue.delete();
+			System.out.println(deleted +" succesfully deleted\n");
+		}
+}
+public static void option2 (Queue queue)
+{
+	starLine();
+	kb.nextLine();
+	System.out.print("Please enter a name with no spaces to be inserted: ");
+	String s = kb.nextLine();
+	queue.insert(s);
+
+	System.out.println(s+" has been inserted into the queue");
+}
+public static void option3 (Queue queue)
+{
+	starLine();
+	if(queue.isEmpty())
+		{System.out.println("Queue is empty");}
+	else
+		{System.out.println("Queue is not empty");}
+}
+public static void option4 (Queue queue)
+{
+	starLine();
+	System.out.println(queue.toString());	
+}
+public static void option5 (Queue queue)
+{
+	starLine();
+	System.out.println(queue.toStore());
+}
+public static void starLine()
+{
+	System.out.println
+("\n**************************************************************\n");
+}
+}
+
+///////////////GreekHeroArray//////////////
+
+package program4;
+
+public class GreekHeroArray extends Queue {
+    private GreekHero[] cards;
+
+    /**
+     * Default constructor for the array of GreekHero cards
+     */
+    public GreekHeroArray()
+    {
+        cards = new GreekHero[]
+        {   
+            // bravery, wisdom, strength, ferocity, fear factor
+            
+            new GreekHero("Achilles",   20,  48,  78, 14, 12),
+            new GreekHero("Medusa",      5,  30,  60, 12, 50),
+            new GreekHero("Chimera",     5,  10, 140, 20, 48),
+
+            new GreekHero("Polyphemus",  8,  18, 140, 15, 47),
+            new GreekHero("Cetus",       5,  14, 150, 16, 45),
+            new GreekHero("Zeus",       10, 100, 200,  8, 40),
+
+            new GreekHero("Minotaur",   12,  25, 138, 18, 40),
+            new GreekHero("Craeae",      6,  99,  30,  1, 40),
+            new GreekHero("Pegasus",    20,  20, 180,  9, 37),
+
+            new GreekHero("Siren",       3,  30, 160,  7, 36),
+            new GreekHero("Daphne",     10,  21,  47,  2, 30),
+            new GreekHero("Poseidon",   20,  90, 150, 15, 30),
+
+            new GreekHero("Theseus",    26,  38,  75, 10, 12),
+            new GreekHero("Odysseus",   30,  56,  65, 10, 11),
+            new GreekHero("Perseus",    26,  40,  70,  9, 10),
+
+            new GreekHero("Icarus",     18,  65,  50,  2,  9),
+            new GreekHero("Jason",      27,  39,  68,  8,  9),
+            new GreekHero("Oedipus",    26,  74,  63,  1,  7),
+
+            new GreekHero("Pandora",    10,  50,  32,  1,  5),
+            new GreekHero("Orpheus",    30,  51,  41,  4,  5),
+            new GreekHero("Sisyphus",    9,  80,  40,  3,  5),
+
+            new GreekHero("Ariadne",    29,  45,  40,  2,  3),
+            new GreekHero("Narcissus",   3,  50,  50,  8,  2),
+            new GreekHero("Aphrodite",   9,  49,  40,  6,  2),
+
+            new GreekHero("Trojan Horse", 0,  0, 185, 18, 29),
+            new GreekHero("Hermes",     18,  84, 100,  6, 29),
+            new GreekHero("Athene",     19,  85, 110,  5, 25),
+
+            new GreekHero("Prometheus", 22,  70,  37,  3, 24),
+            new GreekHero("Actaeon",    23,  20,  80,  3, 22),
+            new GreekHero("Heracles",   15,  55, 170, 13, 22)
+            
+        };
+    }
+
+    /**
+     * Accessor method to the array of GreekHero cards
+     *
+     * @return array of GreekHero cards created
+     */
+    public GreekHero[] getCards()
+    {
+        return cards;
+    }
+
+////////////////////Start of GreekHero class////////////////
+package program4;
+
+public class GreekHero {
+    private String _name;
+    private int _bravery;
+    private int _wisdom;
+    private int _strength;
+    private int _ferocity;
+    private int _fearFactor;
+ 
+    /**
+     * Constructor with parameters
+     */ 
+    public GreekHero(String name, int bravery, int wisdom, 
+                     int strength, int ferocity, int fearFactor)
+    {
+        _name = name;
+        _bravery = bravery;
+        _wisdom = wisdom;
+        _strength = strength;
+        _ferocity = ferocity;
+        _fearFactor = fearFactor;
+    }
+    
+    /**
+     * Accessor method for name
+     *
+     * @return _name
+     */
+    public String getName()
+    {
+        return _name;
+    }
+  
+    /**
+     * Accessor method for bravery
+     *
+     * @return _bravery
+     */
+    public int getBravery()
+    {
+        return _bravery;
+    }
+    
+    /**
+     * Accessor method for wisdom
+     *
+     * @return _wisdom
+     */
+    public int getWisdom()
+    {
+        return _wisdom;
+    }
+
+    /**
+     * Accessor method for strength
+     *
+     * @return _strength
+     */
+    public int getStrength()
+    {
+        return _strength;
+    }
+
+    /**
+     * Accessor method for ferocity
+     *
+     * @return _ferocity
+     */
+    public int getFerocity()
+    {
+        return _ferocity;
+    }
+
+    /**
+     * Accessor method for fear facto0r
+     *
+     * @return _fearFactor
+     */
+    public int getFearFactor()
+    {
+        return _fearFactor;
+    }
+  
+    /**
+     * toString method
+     *
+     * @return string representation of a GreekHero
+     */
+    public String toString()
+    {
+        return "[" + _name + "]\n" + 
+             "(a)Bravery:" + _bravery + ", (b)Wisdom:" + _wisdom +
+             ", (c)Strength:" + _strength + ", (d)Ferocity:" + _ferocity + 
+             ", (e)Fear Factor:" + _fearFactor;
+    }
+} // end class GreekHero()
+
+///////////////////////Start of Queue class//////////////////
+
+package program4;
+public  class Queue{
+
+	private Object [] _queue;
+	private int startSize = 16;
+	private int _dataSize =0;
+	private int _back = 0;
+	
+	
+	public Queue ()
+	{
+		_queue = new Object[startSize];
+		for (int i =0; i<startSize; i++)
+		{
+			_queue[i]="Open";
+		}
+	}
+	public Object delete ()
+	{
+		Object deleted = _queue[0];
+			for(int i = 0; i<=_dataSize-1;i++)
+			{
+				if (i == _dataSize-1)
+					_queue[i]="Open";
+				else
+				_queue[i] = _queue[i+1];
+			}
+			_dataSize--;
+			_back--;
+			return deleted;
+	}
+	public void insert(Object insert)
+	{
+		if(_dataSize >= _queue.length)
+		{
+			Object [] temp = new Object [_queue.length + startSize];
+			for (int i = 0; i<_dataSize; i++)
+				temp[i] = _queue[i];
+				_queue = temp;
+		}
+		_queue[_dataSize]=insert;
+		_dataSize++;
+		_back++;
+	}
+	public boolean isEmpty ()
+	{
+		if (_queue [0].equals("Open")||_queue[0].equals(null))
+		{return true;}
+		else 
+			return false;		
+	}
+	public String toString ()
+	{
+		String s = "";
+		s = s+"Front-";
+		for (int i =0; i<_dataSize;i++)
+		{
+			s = s+ " Position "+(i+1)+": "+_queue[i];
+		}
+		s=s+" -Back";
+		return s;	
+	}
+	
+	public String toStore ()
+	{
+		String s = "";
+		s = s+"Front-";
+		for (int i =0; i<_queue.length-1;i++)
+		{
+			s = s+ " Position "+(i+1)+": "+_queue[i];
+		}
+		s=s+" -Back";
+		return s;
+		
+	}
+}
