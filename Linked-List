@@ -1,0 +1,247 @@
+/* This program was written to use a linked list data structure*/
+/*This is a multifile java program smashed into one, I will commit where each class starts*/
+
+package program6;
+
+import java.util.Scanner;
+public class Program6 {
+
+				
+ public static Scanner kb=new Scanner(System.in);
+  public static void menu() 
+  {
+		starLine();
+         System.out.println("1: Insert at given position");
+         System.out.println("2: Insert at front of list");
+         System.out.println("3: Delete given item");
+         System.out.println("4: Retrieve item at given position");
+         System.out.println("5: Find the the position of a given item");
+         System.out.println("6: Show size of list");
+         System.out.println("7: Show the entire contents of the list");
+         System.out.println("8: Quit back to list selection");
+   }
+ public static int input() {
+     int choice=0;
+     while(true) {
+        do {
+              System.out.print("Enter choice: ");
+              choice = kb.nextInt();
+              kb.nextLine();
+              
+              if (choice < 1 || choice > 8)
+              {
+            	  System.out.println("ERROR || Invalid input");
+              }
+              else if(choice >= 1 || choice <= 8)
+                   return choice;
+         
+        }while(true) ;
+      }
+    }
+public static void main(String[] args) {
+	System.out.println("Hello, use this program to create lists of data,\n\t"
+						+"and manipulate said data");
+
+             
+	List intList = new List();
+	List stringList = new List ();
+	int listChoice = 0;
+do {
+	starLine();
+	System.out.print("Which list would you like to edit?\n\t"
+			+ "List 1 is for integers\n\t"
+			+ "List 2 is for Strings\n\t"
+			+ "Enter 3 to quit program\n"
+			+ "Enter your choice: ");
+	listChoice = kb.nextInt();
+	if (listChoice == 1)
+		run(intList);
+	else if(listChoice == 2)
+		run(stringList);
+}while (listChoice != 3);
+System.out.println("Goodbye!");
+}
+public static void run(List listChoice) {
+    String data;
+    int pos;
+    int choice=0;
+  do {
+      menu();
+      choice=input();
+      if(choice == 1) {
+              System.out.print("Enter data to be inserted: ");
+              data=kb.nextLine();
+              System.out.print("Enter position: ");
+              pos=kb.nextInt();
+              kb.nextLine();
+              listChoice .insert(data, pos);
+      }
+      else if(choice == 2) {
+              System.out.print("Enter data to be inserted: ");
+              data=kb.nextLine();
+              listChoice .insertAtFront(data);
+      }
+      else if(choice == 3) {
+              System.out.print("Enter data to be deleted: ");
+              data=kb.nextLine();
+              listChoice .deleteItem(data);
+      }
+      else if(choice == 4) {
+              System.out.print("Enter position of data to be retrieved: ");
+              pos=kb.nextInt();
+              kb.nextLine();
+              Object obj=listChoice .retrieve(pos);
+              System.out.println("Data retrieved: "+obj);
+      }
+      else if(choice == 5) {
+          System.out.print("Enter data whose position to find: ");
+          data=kb.nextLine();
+          List listCopy=listChoice .find(data);
+          System.out.println("Position of data in list: "+listCopy.toString());
+      }
+      else if(choice == 6) 
+              {System.out.println("Size of list: "+listChoice .getSize());}
+      
+      else if(choice == 7) 
+              {System.out.println("Content of  list: "+listChoice .toString());}
+          
+      else if (choice == 8)
+      	{ 
+      	continue;}
+  
+  }while(choice!=8);
+}
+
+ public static void starLine()
+ {
+ System.out.println("\n****************************************************\n");
+ }
+}
+
+/////////////////////List Class///////////////////////////
+package program6;
+
+public class List {
+    private Link _head;
+    private int _count;
+  
+public List() 
+    {
+      _head = null;
+      _count = 0;
+    }
+public boolean isEmpty() 
+	{ return _head == null;}
+
+public void insertAtFront(Object data) 
+	{
+	Link nLink = new Link();
+	nLink._data = data;
+	nLink._next = _head;
+	_head = nLink;
+      _count++;
+ System.out.println("Successfully inserted "+data+" at the front of the list");
+
+    }
+  
+public void insert(Object data, int pos) 
+{
+      if(pos<1 || pos>_count+1) 
+      {
+       System.out.println("ERROR || Invalid Position");
+       System.out.println("Failed to insert "+data+" at postiton "+pos);
+           return;
+       }
+        if(pos == 1) 
+        {
+          insertAtFront(data);
+          System.out.println("Successfully inserted "+data+" at postiton "+pos);
+          return;
+        }
+        
+        Link temp = _head;
+        for(int i = 1; i < pos-1; i++)
+        	{ temp = temp._next;}
+           
+	Link link = _head;
+	link._next = temp;
+    _count++;
+    System.out.println("Successfully inserted "+data+" at postiton "+pos);
+    }
+
+public void deleteItem(Object data) 
+    {
+     if(isEmpty())
+     { System.out.println("List is Empty!");
+    	 return;}
+     
+      Link temp = _head;
+      Link prev = null;
+       
+      while(temp != null && !temp._data.equals(data)) 
+      { 
+    	  prev = temp;
+    	  temp = temp._next;
+      }
+     
+      if (temp != null) {
+          if (prev == null) 
+        	  { _head = temp._next;}
+          
+          else 
+        	  {  prev._next = temp._next;}
+          }
+      }
+public Object retrieve(int position) {
+      if(position < 1 || position > _count)
+              return null;
+      Link temp = _head;
+      for(int i = 1; i < position; i++)
+              temp=temp._next;
+      return temp._data;
+}
+
+public List find(Object data) 
+{
+      List list = new List();
+      Link temp = _head;
+      int k = 1;
+      while(temp != null) {
+              if(temp._data.equals(data))
+              { list.insert(k, list.getSize()+1);}
+              
+          temp = temp._next;
+          k++;
+      }
+      return list;
+}
+public int getSize() 
+	{ return _count;}
+
+public String toString() 
+{
+      String s = "---Front---";
+      Link temp = _head;
+      while(temp != null) 
+      {
+         s += temp._data.toString();
+         if(temp._next != null)
+             {s += ", ";}
+         temp = temp._next;
+      }
+      s  += "---Back---";
+      return s ;
+}
+}
+
+/////////////////Link Class/////////////////////
+package program6;
+
+public class Link {
+
+	public Object _data;
+	public Link _next;
+	
+  }
+
+
