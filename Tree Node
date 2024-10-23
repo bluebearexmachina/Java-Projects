@@ -1,0 +1,165 @@
+package program7;
+
+import java.util.Scanner;
+import java.util.*;
+import java.util.Random;
+public class Program7 {
+	
+	static Scanner kb =new Scanner(System.in);
+	
+	public static void main(String[] args) {
+		int choice;
+		
+	do
+	{
+	System.out.println("Please select one of the following options.");
+	System.out.println("1. use the tools of the table");
+	System.out.println("2. create 10 tables to calculate the worst "
+						+ "case retrieval time");
+	System.out.println("3. quit the program");
+	
+	choice=kb.nextInt();
+	if(choice<1 || choice >3)
+		{System.out.println("Please enter 1,2 or 3.");}
+
+	if(choice==1)
+		{optionOne();}
+	
+	else if(choice==2)
+		{optionTwo();}
+	
+	}while(choice !=3 );
+}
+	
+public static void optionTwo(){
+	Random rand=new Random();
+	
+	int height=0;
+	
+	for(int i=2;i<=32768;i=i*2){
+
+		for(int ix=0;ix<10;++ix){
+			Table tree=new Table();
+			
+			for(int ixx=0;ixx<i;ixx++){
+				
+				int number=rand.nextInt();
+				KeyableNumber num= new KeyableNumber(number);
+				tree.insert(num);
+				}
+			
+		if(height<tree.getHeight())
+			{height=tree.getHeight();}
+		}
+		
+	System.out.print("The worst case performance:");
+	System.out.println(height);
+	}
+}
+public static void optionOne() {	
+	int choice;
+	Table table = new Table();
+		
+	do
+	{
+	System.out.println("Please select one of the following options...");
+	System.out.println("1: initialize an empty Table.");
+	System.out.println("2: insert an item in the Table.");
+	System.out.println("3: delete an item in the Table.");
+	System.out.println("4: search an item in the Table.");
+	System.out.println("5: get height of the tree.");
+	System.out.println("6: get size of the number of nodes.");
+	System.out.println("7: display the contents of the table in tree form.");
+	System.out.println("8: display the contents in order by their keys.");
+	System.out.println("9: quit program.");
+		choice=kb.nextInt();
+		
+		
+	if(choice<1 || choice>9){
+		System.out.println("Please enter a number between one and ten.");
+		}
+	
+	if (choice==1){
+		Table newTable=new Table();
+		table = newTable;
+		}
+	
+	else if(choice==2)	{
+		String teamName,name;
+		int number;
+		double score;
+		
+		System.out.println("Please enter the jersey number.");
+			number=kb.nextInt();
+			
+		System.out.println("Please enter the scoring avg for that player.");
+			score=kb.nextDouble();
+			
+		System.out.println("Please enter the team name.");
+			teamName=kb.next();
+			
+		System.out.println("Please enter the name of the player.");
+			name=kb.next();
+		
+		NBAPlayer player = new NBAPlayer(name,score,number,teamName);
+		table.insert(player);
+		
+		System.out.println(name + " sucessfully inserted");
+		}
+	
+	else if(choice==3){
+		TreeNode search = null;
+		String teamName;
+		int jerseyNumber;
+		
+		System.out.println("Please enter the name of team you wish to "
+							+ "delete.");
+			teamName=kb.next();
+			
+		System.out.println("Enter the jersey number of the player.");
+			jerseyNumber=kb.nextInt();
+		NBAPlayerKey key = new NBAPlayerKey(jerseyNumber,teamName);
+		
+		search = table.delete(key);
+		
+	System.out.println(jerseyNumber + "from "+teamName+" Successfully deleted");
+		}
+	else if(choice==4){
+		String teamName;
+		Keyable search;
+		int number;
+		
+		System.out.println("Please enter the jersey number.");
+			number=kb.nextInt();
+		System.out.println("Please enter the team name.");
+			teamName=kb.next();
+			
+		NBAPlayerKey key=new NBAPlayerKey(number,teamName);
+		search=table.search(key);
+		
+		if(search == null)
+			{System.out.println("Not found");}
+		
+		else{
+		System.out.println("Match Found");
+		System.out.println(search.toString());
+		}
+	}
+		else if(choice==5)
+			{System.out.println(table.getHeight());}
+	
+		else if(choice==6)
+			{System.out.println(table.getSize());}
+	
+		else if(choice==7){
+		System.out.println("\n\n");
+		System.out.println(table.showTree());
+		}
+	
+		else if(choice==8)
+			{System.out.println(table.toString());}
+	
+		}while(choice!=9);
+
+	}	
+}
