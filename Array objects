@@ -1,0 +1,329 @@
+/*Program for array data manipulation, using objects, this program reads from a seperate text file
+of stats from different broadway productions*/
+
+
+package program3;
+import java.io.*;
+import java.util.Scanner;
+
+public class Program3 {
+	
+	static Scanner kb = new Scanner(System.in);
+		
+	public static void main(String[] args)
+	{
+		int choice;
+		ProductionStats [] productions = new ProductionStats[100];
+		int nProducs;
+		nProducs = loadArray(productions);
+		System.out.println("Welcome, this program is made to display "
+				+ "information about \n\tBroadway productions");
+	do{
+		lineDisplay();
+		choice = showMenu();
+		if(choice == 1)
+			{option1(productions, nProducs);}
+		if(choice == 2)
+			{option2(productions, nProducs);}
+		if(choice == 3)
+			{option3(productions, nProducs);}
+		if(choice == 4)
+			{option4(productions, nProducs);}		
+	
+		}while (choice != 5);
+		
+		System.out.println("Goodbye.");
+	}
+	public static void lineDisplay()
+	{
+		System.out.println("\n----------------------------------------------"
+				+ "----------------\n");
+	}
+	public static int showMenu ()
+	{
+		int choice;
+		System.out.println("Available options:\n");
+		
+		System.out.println("Option 1: View all data");
+		System.out.println("Option 2: View data for desired entry");
+		System.out.println("Option 3: Data Quiz");
+		System.out.println("Option 4: View distribution of Tony's by \n\t  "
+				+ "number of performances");
+		System.out.println("Option 5: Quit program");
+		System.out.print("\nPlease enter your desired option: ");
+		choice = kb.nextInt();	
+		lineDisplay();
+		return choice;
+	}
+	private static int loadArray(ProductionStats[] arrayOfRecords) 
+	{
+		int nProducs = 0;
+		try
+		{
+		File file = new File
+			("C:\\Users\\brian\\OneDrive\\Desktop\\CSC205\\Program3doc.txt");
+		Scanner inFile = new Scanner (file);
+		do
+		{
+			arrayOfRecords[nProducs]=new ProductionStats();
+			arrayOfRecords[nProducs]._playName =inFile.next();
+			arrayOfRecords[nProducs]._theatreName = inFile.next();
+			arrayOfRecords[nProducs]._performances = inFile.nextInt();
+			arrayOfRecords[nProducs]._tonys = inFile.nextInt();
+			++nProducs;
+		}
+		while (!arrayOfRecords[nProducs-1]._playName.equals("EOF"));
+		--nProducs;
+		}
+		catch (IOException ioe)
+		{
+			System.out.println("File access error");
+			nProducs = 0;
+		}	
+		return nProducs;
+	}
+	public static void option1 (ProductionStats[] array, int dataSize)
+	{
+		kb.nextLine();
+	System.out.printf("%-40s%-30s%-20s%-10s\n", "Broadway Show","Debut Theatre",
+				"# of Performances","# of Tony Awards");
+	
+		System.out.println("-------------------------------------------------"
+			+ "-----------------------------------------------------------");
+	
+	for (int i = 0; i<dataSize; i++)
+		{
+		System.out.printf("%-40s%-30s%11d%19d\n", array[i]._playName,
+			array[i]._theatreName,array[i]._performances,array[i]._tonys);
+		
+		if(i % 15 == 12)
+			{
+				System.out.println("\nPRESS ENTER TO VIEW MORE");
+				kb.nextLine();
+			}
+		}
+	}
+public static void option2 (ProductionStats[] array, int dataSize) 
+{
+	boolean found = false;
+	kb.nextLine();
+	System.out.print("Please enter the name of the "
+				+ "show you would like to view: ");
+	String userChoice = kb.nextLine();
+	for (int i = 0; i<dataSize; i++)
+	{
+		String name = array[i]._playName;
+	
+		if (name.equals(userChoice))
+		{
+			lineDisplay();
+							
+System.out.printf("%-40s%-30s%-20s%-10s\n", "Broadway Show","Debut Theatre",
+					"# of Performances","# of Tony Awards");
+System.out.println("-------------------------------------------------"
+			+ "----------------------------------------------------------");									
+System.out.printf("%-40s%-30s%11d%19d\n", array[i]._playName,
+			array[i]._theatreName,array[i]._performances,array[i]._tonys);
+				i = dataSize;
+				found = true;
+		}
+		else
+		{found = false;}
+	}
+	if (found == false)
+		{System.out.println("NO RECORD FOUND");}
+}
+
+public static void option3 (ProductionStats[] array, int dataSize) 
+	{
+		int guess;
+		char choice = 'y';
+		int qAsked = 0;
+		int correctChoice = 0;
+System.out.println("Let's play a game! I'll display the name of a production\n"
+		+ "and you guess the number of tony's that it won (it can be 0-12)");
+		lineDisplay();
+
+	do{
+		for(int i = 0; i<dataSize; i++)
+		{
+			System.out.println("\n"+array[i]._playName);
+			System.out.print("Guess: ");
+			guess = kb.nextInt();
+	if(guess == array[i]._tonys)
+	{
+		qAsked++;
+		correctChoice++;
+		System.out.println("Good job! You got it right!\n");
+		System.out.print("Enter Y to continue or N to quit and view results:");
+		choice = Character.toLowerCase(kb.next().charAt(0));
+			if (choice == 'n')
+				{i = dataSize;}
+		}
+		else
+		{
+		qAsked++;
+		System.out.println("\nWrong guess");
+		System.out.print("Enter Y to continue or N to quit and view results:");
+		choice = Character.toLowerCase(kb.next().charAt(0));
+			if(choice == 'n')
+				{i = dataSize;}
+			}
+		}
+	}while(choice == 'y');
+	lineDisplay();
+	System.out.println("\nResults:");
+	System.out.println("Number of questions asked: "+qAsked);
+	System.out.println("Number of correct guesses: "+correctChoice);
+}
+	
+public static void option4 (ProductionStats[] array, int dataSize) 
+	{
+
+		int arrayIX = 0;
+		
+		int min = calcMin(array,dataSize);
+		int max = calcMax(array, dataSize);
+		
+		int range = max - min;
+		int decade =(int)Math.ceil(max/10);	
+
+		int arraySize = (range/decade)+1;
+		int[] dataArray = new int[arraySize];
+		
+		for (int i =0;i<dataSize;i++)
+		{
+			arrayIX = (array[i]._performances - min)/decade;
+			dataArray [arrayIX] += array[i]._tonys;
+		}
+		for (int i = 0; i<arraySize; i++)
+		{
+			histogram(decade*(i+1),dataArray[i],i);
+		}
+}
+	public static void histogram(int perform , int sumOfTonys, int index)
+	{
+		String stars = "";
+		int starCount = 0;
+		int counter = 0;
+		while (index == 0)
+		{	System.out.printf("%-25s%-10s\n","# of Performances",
+				"# of Tony Awards");
+			index++;
+		}
+		while (starCount < sumOfTonys)
+		{
+			starCount++;
+			counter++;
+			stars = stars + "*";
+			if(counter > 49)
+			{
+				stars = stars + "\n\t\t\t\t   ";
+				counter = 0;
+			}
+		}	
+		if (perform != 0)
+		{
+			System.out.printf("%10s%25s%5s\n",perform,sumOfTonys,stars);			
+		}
+	}
+	public static int calcMin (ProductionStats[] array,int dataSize)
+	{	int smallest = array[0]._performances;
+		for (int i = 0; i<dataSize; ++i) 
+		{
+			if (array[i]._performances < smallest)
+				smallest = array[i]._performances;
+		}
+		return smallest;
+	}
+	public static int calcMax (ProductionStats[] array, int dataSize)
+	{
+		int largest = array[0]._performances;
+		for (int i = 0; i<dataSize; ++i) 
+		{
+			if (array[i]._performances > largest)
+				largest = array[i]._performances;
+		}
+		return largest;
+	}
+}
+
+///////////////////Start of ProductionStats class/////////////////
+package program3;
+
+public class ProductionStats 
+	{
+		public String _playName;
+		public String _theatreName;
+		public int _performances;
+		public int _tonys;
+		
+	}
+
+//////////////Start of text file/////////////////////
+ThePhantomoftheOpera 				HisMajesty'sTheatre	13981 		7
+Chicago						46thStreetTheatre	10673		6
+TheLionKing					OrpheumTheatre		10292		6
+Wicked						CurranTheatre		7831		3
+Cats						NewLondonTheatre	7485		7
+LesMiserables					PalaisdesSports		6680		8
+AChorusLine					ShubertTheatre		6137		9
+Oh!Calcutta!					EdenTheatre		5959		0
+MammaMia!					PrinceEdwardTheatre	5758		0
+BeautyandtheBeast				PalaceTheatre		5461		1
+Rent						NewYorkTheatreWorkshop	5123		4
+TheBookofMormon					EugeneO'NeillTheatre	4687		9
+JerseyBoys					AugustWilsonTheatre	4642		4
+MissSaigon					TheatreRoyal		4092		3
+42ndStreet					WinterGardenTheatre	3486		2
+Aladdin						5thAvenueTheatre	3458		1
+Grease						EdenTheatre 		3388		0
+FiddlerontheRoof				ImperialTheatre 	3242		9
+LifeWithFather					EmpireTheatre 		3224		0
+TobaccoRoad					JohnGoldenTheatre 	3182		0
+Hamilton					PublicTheatre		2901		11
+Hello,Dolly!					FisherTheatre 		2844		10
+MyFairLady					MarkHellingerTheatre	2717		6
+Hairspray					NeilSimonTheatre	2642		8
+MaryPoppins					NewAmsterdamTheatre 	2619		1
+AvenueQ						VineyardTheatre 	2534		3
+KinkyBoots					AlHirschfeldTheatre 	2505		6
+TheProducers					SaintJamesTheatre 	2502		12
+Beautiful:TheCaroleKingMusical			CurranTheatre 		2416		2
+Annie						NeilSimonTheatre 	2377		7
+Cabaret						ShubertTheatre 		2377		4
+ManofLaMancha				ANTAWashingtonSquareTheatre 	2328		5
+RockofAges					BrooksAtkinsonTheatre 	2328		0
+Abie'sIrishRose					FultonTheatre 		2327		0
+Oklahoma!					SaintJamesTheatre 	2212		1
+SmokeyJoe'sCafe					VirginaTheatre 		2036		0
+Pippin						ImperialTheatre 	1944		5
+SouthPacific					MajesticTheatre 	1925		10
+TheMagicShow					CortTheatre 		1920		0
+Aida						PalaceTheatre 		1852		5
+Gemini						LittleTheatre 		1819		0
+Deathtrap					MusicBoxTheatre 	1775		0
+Dancin'						BroadhurstTheatre 	1774		2
+LaCageauxFolles					PalaceTheatre 		1761		6
+Hair						BiltmoreTheatre 	1750		0
+HarryPotterandtheCursedChild			LyricTheatre 		1673		6
+DearEvanHansen					MusicBoxTheatre 	1672		6
+TheWiz						MajesticTheatre 	1672		7
+ComefromAway					GeraldSchoenfeldTheatre 1669		1
+&Juliet						StephenSondheimTheatre	509		0
+Appropriate				AliceGriffinJewelBoxTheatre 	54		0
+BacktotheFuture:TheMusical			WinterGardenTheatre 	213		0
+ABeautifulNoise,TheNeilDiamondMusical		BroadhurstTheatre 	489		0
+DaysofWineandRoses				LindaGrossTheatre	9		0
+Doubt						ManhattanTheaterClub	525		4
+Hadestown					WalterKerrTheatre	1372		8
+HowtoDanceinOhio				BelascoTheatre		64		0
+KimberlyAkimbo					LindaGrossTheatre	516		5
+MerrilyWeRollAlong				YorkTheatre		136		0
+MJ:TheMusical					NederlanderTheatre	837		4
+MoulinRouge!TheMusical				AlHirschfeldTheatre	1225		10
+PrayerfortheFrenchRepublic			ManhattanTheatreClub	31		0
+Six						ArtsTheatre		961		2
+Spamalot					ShubertTheatre		92		0
+SweenyTodd					UrisTheatre		315		2
+EOF						none			0		0
